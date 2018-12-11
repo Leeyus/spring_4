@@ -4,15 +4,21 @@ import java.awt.Dialog.ModalExclusionType;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
 
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.iu.board.BoardDTO;
 import com.iu.board.notice.NoticeService;
+import com.iu.util.FileSaver;
 import com.iu.util.Pager;
 
 @Controller
@@ -51,11 +57,12 @@ public class NoticeController {
 	
 	//write process
 	@RequestMapping(value="noticeWrite", method=RequestMethod.POST)
-	public String write(BoardDTO boardDTO, RedirectAttributes rd) throws Exception {
-		int result = noticeService.insert(boardDTO);
-		if(result < 1) {
-			rd.addFlashAttribute("msg", "Insert Fail");
-		}
+	public String write(BoardDTO boardDTO,HttpSession session, MultipartFile [] f1, RedirectAttributes rd) throws Exception {
+		String realPath = session.getServletContext().getRealPath("resources/upload");
+		System.out.println(realPath);
+		
+		int result = noticeService.insert(boardDTO, f1, session);
+		
 		return "redirect:./noticeList";
 	}
 	
